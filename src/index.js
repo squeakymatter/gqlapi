@@ -3,6 +3,7 @@ const express = require('express');
 require('dotenv').config();
 const { ApolloServer } = require('apollo-server-express');
 const db = require('./db');
+const models = require('./models');
 
 const port = process.env.PORT;
 
@@ -12,9 +13,17 @@ const resolvers = require('./resolvers');
 
 //Create express app
 const app = express();
+
 //Apollo Server
-const server = new ApolloServer({ typeDefs, resolvers });
-//Apply  Apollo GraphQL middleware and set path to /api
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  context: () => {
+    return { models };
+  },
+});
+
+//Apollo GraphQL middleware - set path to /api
 server.applyMiddleware({ app, path: '/api' });
 app.get('/', (req, res) => res.send('Hello World'));
 
